@@ -1,7 +1,7 @@
 import React from "react";
 
 // We'll use ethers to interact with the Ethereum network and our contract
-import {ethers} from "ethers";
+import { ethers } from "ethers";
 
 // We import the contract's artifacts and address here, as we are going to be
 // using them with ethers
@@ -11,13 +11,15 @@ import contractAddress from "../contracts/contract-address.json";
 // All the logic of this dapp is contained in the Dapp component.
 // These other components are just presentational ones: they don't have any
 // logic. They just render HTML.
-import {NoWalletDetected} from "./NoWalletDetected";
-import {ConnectWallet} from "./ConnectWallet";
-import {Loading} from "./Loading";
-import {Transfer} from "./Transfer";
-import {TransactionErrorMessage} from "./TransactionErrorMessage";
-import {WaitingForTransactionMessage} from "./WaitingForTransactionMessage";
-import {NoTokensMessage} from "./NoTokensMessage";
+import { NoWalletDetected } from "./NoWalletDetected";
+import { ConnectWallet } from "./ConnectWallet";
+import { Loading } from "./Loading";
+import { Transfer } from "./Transfer";
+import { TransactionErrorMessage } from "./TransactionErrorMessage";
+import { WaitingForTransactionMessage } from "./WaitingForTransactionMessage";
+import { NoTokensMessage } from "./NoTokensMessage";
+import { Navbar } from "./Navbar";
+import { Content } from "./Content";
 
 // This is the Hardhat Network id that we set in our hardhat.config.js.
 // Here's a list of network ids https://docs.metamask.io/guide/ethereum-provider.html#properties
@@ -62,7 +64,7 @@ export class Dapp extends React.Component {
         // Ethereum wallets inject the window.ethereum object. If it hasn't been
         // injected, we instruct the user to install MetaMask.
         if (window.ethereum === undefined) {
-            return <NoWalletDetected/>;
+            return <NoWalletDetected />;
         }
 
         // The next thing we need to do, is to ask the user to connect their wallet.
@@ -85,78 +87,87 @@ export class Dapp extends React.Component {
         // If the token data or the user's balance hasn't loaded yet, we show
         // a loading component.
         if (!this.state.tokenData || !this.state.balance) {
-            return <Loading/>;
+            return <Loading />;
         }
 
         // If everything is loaded, we render the application.
         return (
+
             <div className="container p-4">
-                <div className="row">
-                    <div className="col-12">
-                        <h1>
-                            {this.state.tokenData.name} ({this.state.tokenData.symbol})
-                        </h1>
-                        <p>
-                            Welcome <b>{this.state.selectedAddress}</b>, you have{" "}
-                            <b>
-                                {this.state.balance.toString()} {this.state.tokenData.symbol}
-                            </b>
-                            .
-                        </p>
+                <Navbar>
+                </Navbar>
+
+                <Content>
+                    <div className="row">
+                        <div className="col-12">
+                            <h1>
+                                {this.state.tokenData.name} ({this.state.tokenData.symbol})
+                            </h1>
+                            <p>
+                                Welcome <b>{this.state.selectedAddress}</b>, you have{" "}
+                                <b>
+                                    {this.state.balance.toString()} {this.state.tokenData.symbol}
+                                </b>
+                                .
+                            </p>
+                        </div>
                     </div>
-                </div>
 
-                <hr/>
 
-                <div className="row">
-                    <div className="col-12">
-                        {/*
+
+                    <hr />
+
+                    <div className="row">
+                        <div className="col-12">
+                            {/*
               Sending a transaction isn't an immediate action. You have to wait
               for it to be mined.
               If we are waiting for one, we show a message here.
             */}
-                        {this.state.txBeingSent && (
-                            <WaitingForTransactionMessage txHash={this.state.txBeingSent}/>
-                        )}
+                            {this.state.txBeingSent && (
+                                <WaitingForTransactionMessage txHash={this.state.txBeingSent} />
+                            )}
 
-                        {/*
+                            {/*
               Sending a transaction can fail in multiple ways. 
               If that happened, we show a message here.
             */}
-                        {this.state.transactionError && (
-                            <TransactionErrorMessage
-                                message={this._getRpcErrorMessage(this.state.transactionError)}
-                                dismiss={() => this._dismissTransactionError()}
-                            />
-                        )}
+                            {this.state.transactionError && (
+                                <TransactionErrorMessage
+                                    message={this._getRpcErrorMessage(this.state.transactionError)}
+                                    dismiss={() => this._dismissTransactionError()}
+                                />
+                            )}
+                        </div>
                     </div>
-                </div>
 
-                <div className="row">
-                    <div className="col-12">
-                        {/*
+                    <div className="row">
+                        <div className="col-12">
+                            {/*
               If the user has no tokens, we don't show the Transfer form
             */}
-                        {this.state.balance.eq(0) && (
-                            <NoTokensMessage selectedAddress={this.state.selectedAddress}/>
-                        )}
+                            {this.state.balance.eq(0) && (
+                                <NoTokensMessage selectedAddress={this.state.selectedAddress} />
+                            )}
 
-                        {/*
+                            {/*
               This component displays a form that the user can use to send a 
               transaction and transfer some tokens.
               The component doesn't have logic, it just calls the transferTokens
               callback.
             */}
-                        {this.state.balance.gt(0) && (
-                            <Transfer
-                                transferTokens={(to, amount) =>
-                                    this._transferTokens(to, amount)
-                                }
-                                tokenSymbol={this.state.tokenData.symbol}
-                            />
-                        )}
+                            {this.state.balance.gt(0) && (
+                                <Transfer
+                                    transferTokens={(to, amount) =>
+                                        this._transferTokens(to, amount)
+                                    }
+                                    tokenSymbol={this.state.tokenData.symbol}
+                                />
+                            )}
+                        </div>
                     </div>
-                </div>
+                </Content>
+
             </div>
         );
     }
@@ -173,7 +184,7 @@ export class Dapp extends React.Component {
 
         // To connect to the user's wallet, we have to run this method.
         // It returns a promise that will resolve to the user's address.
-        const [selectedAddress] = await window.ethereum.request({method: 'eth_requestAccounts'});
+        const [selectedAddress] = await window.ethereum.request({ method: 'eth_requestAccounts' });
 
         // Once we have the address, we can initialize the application.
 
@@ -261,12 +272,12 @@ export class Dapp extends React.Component {
         const name = await this._token.name();
         const symbol = await this._token.symbol();
 
-        this.setState({tokenData: {name, symbol}});
+        this.setState({ tokenData: { name, symbol } });
     }
 
     async _updateBalance() {
         const balance = await this._token.balanceOf(this.state.selectedAddress);
-        this.setState({balance});
+        this.setState({ balance });
     }
 
     // This method sends an ethereum transaction to transfer tokens.
@@ -295,7 +306,7 @@ export class Dapp extends React.Component {
             // We send the transaction, and save its hash in the Dapp's state. This
             // way we can indicate that we are waiting for it to be mined.
             const tx = await this._token.transfer(to, amount);
-            this.setState({txBeingSent: tx.hash});
+            this.setState({ txBeingSent: tx.hash });
 
             // We use .wait() to wait for the transaction to be mined. This method
             // returns the transaction's receipt.
@@ -321,22 +332,22 @@ export class Dapp extends React.Component {
             // Other errors are logged and stored in the Dapp's state. This is used to
             // show them to the user, and for debugging.
             console.error(error);
-            this.setState({transactionError: error});
+            this.setState({ transactionError: error });
         } finally {
             // If we leave the try/catch, we aren't sending a tx anymore, so we clear
             // this part of the state.
-            this.setState({txBeingSent: undefined});
+            this.setState({ txBeingSent: undefined });
         }
     }
 
     // This method just clears part of the state.
     _dismissTransactionError() {
-        this.setState({transactionError: undefined});
+        this.setState({ transactionError: undefined });
     }
 
     // This method just clears part of the state.
     _dismissNetworkError() {
-        this.setState({networkError: undefined});
+        this.setState({ networkError: undefined });
     }
 
     // This is an utility method that turns an RPC error into a human readable
