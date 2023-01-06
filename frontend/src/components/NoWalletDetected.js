@@ -1,7 +1,6 @@
 import React from "react";
-import { ReactElement } from "react";
 
-export const NoWalletDetected = ():ReactElement => {
+export function NoWalletDetected() {
     return (
         <div className="container">
             <div className="row justify-content-md-center">

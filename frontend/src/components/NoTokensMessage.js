@@ -1,10 +1,6 @@
-import { ReactElement } from "react";
+import React from "react";
 
-type Props = {
-    selectedAddress: string;
-}
-
-export const NoTokensMessage = ({selectedAddress}:Props):ReactElement => {
+export function NoTokensMessage({selectedAddress}) {
     return (
         <>
             <p>You don't have tokens to transfer</p>

@@ -1,6 +1,6 @@
-import { ReactElement } from "react";
+import React from "react";
 
-export const Loading = ():ReactElement => {
+export function Loading() {
     return (
         <div
             style={{
